@@ -1,2 +1,2 @@
 # PWA_dicoding_2
-for submission 2
+for submission 2 PWA
