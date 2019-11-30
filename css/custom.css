@@ -1,0 +1,28 @@
+@media (max-width: 978px) {
+
+    header, main, footer {
+      padding-left:0!important;
+    }
+
+    #background-home h3{
+		font-size: 50px!important;
+		text-align:left!important;
+	}
+
+}
+
+header, main, footer {
+  padding-left: 300px;
+}
+
+#background-home h3{
+	color :#2BBBAD;
+	font-weight: bolder;
+	font-size: 100px;
+	text-align:right;
+}
+
+.card-content{
+	padding-top:5px!important;
+	padding-bottom:5px!important;
+}
