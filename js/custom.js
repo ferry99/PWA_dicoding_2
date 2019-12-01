@@ -35,6 +35,9 @@ var blog = {
 	    M.Sidenav.init(elems);
 	},
 
+	reinit: function(){
+  		$('select').formSelect();
+	},
 	
 
 	loadNav: function(){
@@ -54,12 +57,14 @@ var blog = {
 	},
 
 	loadPage: function(pages){
+		self = this;
 		var xhttp = new XMLHttpRequest();
 		xhttp.onreadystatechange = function() {
 		if (this.readyState == 4) {
 		  var content = document.querySelector("#body-content");
 		  if (this.status == 200) {
 		    content.innerHTML = xhttp.responseText;
+		    self.reinit();
 		  } else if (this.status == 404) {
 		    content.innerHTML = "<p>Page not found.</p>";
 		  } else {
@@ -85,8 +90,7 @@ var blog = {
 		})
 
 		$('body').on('click' , '#load-league' , function(){
-			idLeague = 2021;
-
+			idLeague = $("#select-league").val();
 			$.ajax({
 	            url: 'https://api.football-data.org/v2/competitions/'+idLeague+'/standings',
 	            type: 'GET',
@@ -98,10 +102,34 @@ var blog = {
 	            	self.renderTableStanding(result);
 	            },
 	            error: function (error) {
+	               alert('League Not Avaiable !')
+	            }
+        	});
+		})
+
+
+		$('body').on('click' , '.show-detail-team' , function(e){
+			e.preventDefault();
+			idTeam = $(this).attr("data-id");
+
+			$.ajax({
+	            url: 'https://api.football-data.org/v2/teams/'+idTeam,
+	            type: 'GET',
+	            dataType: 'json',
+	            headers: {
+	                'X-Auth-Token': '41998c78d52e4bf588634a956b0aa17e'
+	            },
+	            success: function (result) {
+	            	// console.log(result);
+	            	self.renderModalDetailTeam(result);
+    				$("#detail-team-modal").modal("open");
+	            },
+	            error: function (error) {
 	               alert('err !')
 	            }
         	});
 		})
+
 	},
 
 	renderTableStanding: function(data){
@@ -120,7 +148,7 @@ var blog = {
 						<td>'+rowData['position']+'</td>\
 						<td>'+rowData['team_name']+'</td>\
 						<td>'+rowData['points']+'</td>\
-						<td>'+rowData['team_id']+'</td>\
+						<td><a href="" class="waves-effect waves-light btn show-detail-team" data-id="'+rowData['team_id']+'"><i style="margin-right:0px" class="material-icons left">remove_red_eye</i></a></td>\
 					</tr>';
 				i++;
 				tableData.push(rowData);
@@ -132,15 +160,38 @@ var blog = {
 		}catch(e){
 			alert(e);
 		}
+	},
+
+	renderModalDetailTeam: function(data){
+		try{
+			tableData = []; tr = "";
+			rowData = {
+				'name'       : data.name,
+				'address'    : data.address,
+				'phone'      : data.phone,
+				'website'    : data.website,
+				'founded'    : data.founded,
+				'clubColors' : data.clubColors,
+				'venue'      : data.venue,
+			}
+
+
+			$.each(rowData , function(key , value){
+				tr += 	'<tr>\
+					<th>'+key+'</th>\
+					<td>'+value+'</td>\
+				</tr>';
+			})
+			$("#detail-team-table-info").html(tr);
+		}catch(e){
+			alert(e);
+		}
 	}
 }
 
 
 $(function(){
-   $('select').attr("class", "browser-default")
-
-	$('select').formSelect();
-
+	$('.modal').modal();
 	blog.init();
 
 

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
-  <title>Prog Blog</title>
+  <title>Football League</title>
   <meta name="description" content="Prog Blog"/>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#00897B"/>
@@ -21,13 +21,37 @@
         <a href="#" data-target="slide-out" class="sidenav-trigger"><i class="material-icons">menu</i></a>
 	 </div>
           
+
   <main>
 	  <div class="container" id="body-content">
 	  </div>  	
+
   </main>
 
-  <script src="js/jquery.js"></script>
+  <div id="detail-team-modal" class="modal modal-fixed-footer">
+    <div class="modal-content">
+      <h4>Detail Team</h4>
+        <table class="striped" id="detail-team-table-info" style="width:50%">            
+            <tbody>
+              <tr>
+                <th>Name</th>
+                <td>Eclair</td>                
+              </tr>
+              <tr>
+                <th>Venue</th>
+                <td>Jellybean</td>
+              </tr>
+            </tbody>
+        </table>    
 
+       
+    </div>
+    <div class="modal-footer">
+      <a href="#!" class="modal-close waves-effect waves-green btn-flat">Close</a>
+    </div>
+  </div>
+
+  <script src="js/jquery.js"></script>
   <script src="js/materialize.min.js"></script>
   <script src="js/custom.js"></script>
 </body>
