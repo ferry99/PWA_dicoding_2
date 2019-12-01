@@ -14,7 +14,7 @@ var urlsToCache = [
   "js/materialize.min.js",
   "images/js_logo.png",
   "images/pwa_logo.png",
-  "images/logo_sidebar.jpg",
+  "images/logo_football.jpg",
   "icon.png",
   "manifest.json"
 ];

@@ -26,3 +26,11 @@ header, main, footer {
 	padding-top:5px!important;
 	padding-bottom:5px!important;
 }
+
+#standing-table > thead > tr > th{
+	text-align: center;
+}
+
+#standing-table > tbody > tr > td{
+	text-align: center;
+}

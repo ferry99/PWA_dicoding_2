@@ -35,6 +35,8 @@ var blog = {
 	    M.Sidenav.init(elems);
 	},
 
+	
+
 	loadNav: function(){
 		self = this;
 		var xhttp = new XMLHttpRequest();
@@ -73,6 +75,7 @@ var blog = {
 		self = this;
 		$('body').on('click' , '.sidenav a' , function(){
 			page = $(this).attr("href").substr(1);
+			
 			var windowWidth = $(window).width();
 			if(windowWidth < 978){
 				var instance = M.Sidenav.getInstance($(".sidenav"));
@@ -80,10 +83,65 @@ var blog = {
 			}			
 			self.loadPage(page);
 		})
+
+		$('body').on('click' , '#load-league' , function(){
+			idLeague = 2021;
+
+			$.ajax({
+	            url: 'https://api.football-data.org/v2/competitions/'+idLeague+'/standings',
+	            type: 'GET',
+	            dataType: 'json',
+	            headers: {
+	                'X-Auth-Token': '41998c78d52e4bf588634a956b0aa17e'
+	            },
+	            success: function (result) {
+	            	self.renderTableStanding(result);
+	            },
+	            error: function (error) {
+	               alert('err !')
+	            }
+        	});
+		})
+	},
+
+	renderTableStanding: function(data){
+		try{
+			standing  = data.standings[0].table;
+			limit     = 10;
+			i         = 0;
+			tableData = []; rowData = []; tr = "";
+			$.each(standing , function(key , row){
+				rowData['position'] = row.position;
+				rowData['team_id'] = row.team.id;
+				rowData['team_name'] = row.team.name;
+				rowData['img_url'] = row.team.crestUrl;
+				rowData['points'] = row.points;
+				tr += 	'<tr>\
+						<td>'+rowData['position']+'</td>\
+						<td>'+rowData['team_name']+'</td>\
+						<td>'+rowData['points']+'</td>\
+						<td>'+rowData['team_id']+'</td>\
+					</tr>';
+				i++;
+				tableData.push(rowData);
+			})
+
+			$("#standing-table tbody").html(tr);
+			
+			console.log(tableData);
+		}catch(e){
+			alert(e);
+		}
 	}
 }
 
 
 $(function(){
+   $('select').attr("class", "browser-default")
+
+	$('select').formSelect();
+
 	blog.init();
+
+
 })
