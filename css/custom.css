@@ -27,10 +27,21 @@ header, main, footer {
 	padding-bottom:5px!important;
 }
 
-#standing-table > thead > tr > th{
+#standing-table > thead > tr > th , #competition-table > thead > tr > th{
 	text-align: center;
 }
 
-#standing-table > tbody > tr > td{
+#standing-table > tbody > tr > td , #competition-table > tbody > tr > td{
+	font-size:13px;
 	text-align: center;
+}
+
+.preloader-wrapper {
+	z-index: 9999;
+	position: absolute;
+	top :0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	margin: auto;
 }
