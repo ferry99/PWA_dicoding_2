@@ -1,5 +1,6 @@
 {
     "name": "Football League",
+    "gcm_sender_id": "502323881592",
     "short_name": "Football League",
     "description": "Football League blog by ferry sanjaya",
     "start_url": "index.html",
@@ -12,6 +13,5 @@
             "sizes": "512x512",
             "type": "image/png"
         }
-    ],
-    "gcm_sender_id": "489407451958"
+    ]
 }
