@@ -10,10 +10,16 @@ var blog = {
 
 	initIdb : function(){
 		var dbPromise = idb.open("mydatabase", 1, function(upgradeDb) {
-		if (!upgradeDb.objectStoreNames.contains("events")) {
-			upgradeDb.createObjectStore("events");
+		if (!upgradeDb.objectStoreNames.contains("team_fav")) {
+			// upgradeDb.createObjectStore("events");
+			var teamDB = upgradeDb.createObjectStore('team_fav', {keyPath: 'id_team'});
+			teamDB.createIndex("id_team", "id_team", { unique: true });
+			teamDB.createIndex("team_name", "team_name", { unique: false });
+			teamDB.createIndex("created", "created", { unique: false });
 			}
 		});
+
+		
 	},
 
 	initSW:function(){
@@ -27,9 +33,29 @@ var blog = {
 		        .catch(function() {
 		          console.log("Registration SW failed");
 		        });
-		    });
+			});
+			requestPermission();
+
 		} else {
 			console.log("Your browser is not supported SW");
+		}
+
+		function requestPermission() {
+			if ('Notification' in window) {
+			  Notification.requestPermission().then(function (result) {
+				if (result === "denied") {
+				  console.log("Fitur notifikasi tidak diijinkan.");
+				  return;
+				} else if (result === "default") {
+				  console.error("Pengguna menutup kotak dialog permintaan ijin.");
+				  return;
+				}
+				
+				navigator.serviceWorker.getRegistration().then(function(reg) {
+				  reg.showNotification('Notifikasi diijinkan!');
+				});
+			  });
+			}
 		}
 	},
 
@@ -75,7 +101,9 @@ var blog = {
 		    content.innerHTML = xhttp.responseText;
 		    if(pages == "list_competition"){
 		    	self.loadListCompetition();
-		    }
+		    }else if(pages == "favorite_team"){
+				self.loadListIdxDB();
+			}
 		    self.reinit();
 		  } else if (this.status == 404) {
 		    content.innerHTML = "<p>Page not found.</p>";
@@ -147,6 +175,61 @@ var blog = {
         	});
 		})
 
+		$('body').on('click' , '.add-fav-team' , function(e){
+			e.preventDefault();
+			idTeam = $(this).attr("data-id");
+			teamName = $(this).parents("tr").find(".team-name").html();
+			// $(".preloader-wrapper").addClass("active");	
+
+			var dbPromise = idb.open("mydatabase", 1, function(upgradeDb) {
+				if (!upgradeDb.objectStoreNames.contains("team_fav")) {
+					
+					}
+				});
+	
+			dbPromise.then(function(db) {
+				var tx = db.transaction('team_fav', 'readwrite');
+				var team = tx.objectStore('team_fav');
+				var item = {
+					id_team: idTeam,
+					team_name : teamName,
+					created: new Date().getTime()
+				};
+				team.add(item); //menambahkan key "buku"
+				return tx.complete;
+			}).then(function() {
+				$(".preloader-wrapper").removeClass("active");	
+				alert(teamName + ' Has been added!');
+			}).catch(function(e) {
+				$(".preloader-wrapper").removeClass("active");	
+				alert('Failed To Add Team!');
+			})
+		})
+
+
+		$('body').on('click' , '.remove-fav-team' , function(e){
+			e.preventDefault();
+			idTeam = $(this).attr("data-id");
+			var dbPromise = idb.open("mydatabase", 1, function(upgradeDb) {
+				if (!upgradeDb.objectStoreNames.contains("team_fav")) {
+					
+				}
+			});
+
+			dbPromise.then(function(db) {
+				var tx = db.transaction('team_fav', 'readwrite');
+				var teams = tx.objectStore('team_fav');
+				teams.delete(idTeam);
+				return tx.complete;
+			}).then(function() {
+				self.loadListIdxDB();
+				alert('Team Has Been Deleted');
+			}).catch(function(){
+				alert('Error On Delete')
+			});
+			// console.log(idTeam);
+		})
+
 	},
 
 	renderTableStanding: function(data){
@@ -163,11 +246,11 @@ var blog = {
 				rowData['points'] = row.points;
 				tr += 	'<tr>\
 						<td>'+rowData['position']+'</td>\
-						<td>'+rowData['team_name']+'</td>\
+						<td class="team-name">'+rowData['team_name']+'</td>\
 						<td>'+rowData['points']+'</td>\
 						<td>\
 							<a href="" class="waves-effect waves-light btn show-detail-team btn-small" data-id="'+rowData['team_id']+'"><i style="margin-right:0px" class="material-icons left">remove_red_eye</i></a>\
-							<a href="" class="waves-effect waves-light yellow darken-2 btn show-detail-team btn-small" data-id="'+rowData['team_id']+'"><i style="margin-right:0px" class="material-icons left">star_border</i></a>\
+							<a href="" class="waves-effect waves-light yellow darken-2 btn add-fav-team btn-small" data-id="'+rowData['team_id']+'"><i style="margin-right:0px" class="material-icons left">star_border</i></a>\
 						</td>\
 					</tr>';
 				i++;
@@ -176,7 +259,7 @@ var blog = {
 
 			$("#standing-table tbody").html(tr);
 			
-			console.log(tableData);
+			// console.log(tableData);
 		}catch(e){
 			alert(e);
 		}
@@ -265,6 +348,42 @@ var blog = {
                alert('err !')
             }
     	});
+	},
+
+
+	loadListIdxDB : function(){
+		$("#favorite-team-table tbody").html('');
+		$(".preloader-wrapper").addClass("active");	
+		var dbPromise = idb.open("mydatabase", 1, function(upgradeDb) {
+			if (!upgradeDb.objectStoreNames.contains("team_fav")) {
+				
+			}
+		});
+	
+		dbPromise.then(function(db) {
+			var tx = db.transaction('team_fav', 'readonly');
+			var teams = tx.objectStore('team_fav');
+			return teams.getAll();
+		}).then(function(rsTeams) {
+			// console.log(rsTeams);
+			i = 0;
+			tr = "";
+			$.each(rsTeams , function(idx , row){
+				i++;
+				tr += 	'<tr>\
+						<td>'+i+'</td>\
+						<td class="team-name">'+row['team_name']+'</td>\
+						<td>\
+							<a href="" class="waves-effect waves-light btn red remove-fav-team btn-small" data-id="'+row['id_team']+'"><i style="margin-right:0px" class="material-icons left">remove_circle_outline</i></a>\
+						</td>\
+					</tr>';
+			});
+
+			$(tr).appendTo($("#favorite-team-table tbody"));
+			$(".preloader-wrapper").removeClass("active");	
+
+		});
+
 	}
 
 
@@ -273,7 +392,6 @@ var blog = {
 
 $(function(){
 	$('.modal').modal();
+	// $("#md1").modal("open");
 	blog.init();
-
-
 })

@@ -1,7 +1,7 @@
 {
-    "name": "My Programming Blog",
-    "short_name": "My Blog",
-    "description": "Programming blog by ferry sanjaya",
+    "name": "Football League",
+    "short_name": "Football League",
+    "description": "Football League blog by ferry sanjaya",
     "start_url": "index.html",
     "display": "standalone",
     "background_color": "#00897B",
@@ -12,5 +12,6 @@
             "sizes": "512x512",
             "type": "image/png"
         }
-    ]
+    ],
+    "gcm_sender_id": "489407451958"
 }
