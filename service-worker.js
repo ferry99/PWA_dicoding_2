@@ -6,16 +6,15 @@ var urlsToCache = [
   "pages/home.html",
   "pages/standings.html",
   "pages/list_competition.html",
+  "pages/favorite_team.html",
   "css/materialize.min.css",
   "css/custom.css",
   "js/jquery.js",
   "js/custom.js",
   "js/materialize.min.js",
   "js/idb.js",
-  "images/js_logo.png",
-  "images/pwa_logo.png",
   "images/logo_football.jpg",
-  "icon.png",
+  "icon_football.png",
   "manifest.json"
 ];
  
