@@ -1,4 +1,6 @@
 var blog = {
+	api_url : "https://api.football-data.org/",
+
 	init : function(){
 		this.initSidebar();
 		this.loadNav();
@@ -160,8 +162,18 @@ var blog = {
 		$('body').on('click' , '#load-league' , function(){
 			idLeague = $("#select-league").val();
 			$(".preloader-wrapper").addClass("active");	
+			if ('caches' in window) {
+		    caches.match(self.api_url + 'v2/competitions/'+idLeague+'/standings').then(function(response) {
+					if (response) {
+						 response.json().then(function (data) {
+						 	self.renderTableStanding(data);
+		           			$(".preloader-wrapper").removeClass("active");
+						 })
+					}
+				})
+			}
 			$.ajax({
-	            url: 'https://api.football-data.org/v2/competitions/'+idLeague+'/standings',
+	            url: self.api_url + 'v2/competitions/'+idLeague+'/standings',
 	            type: 'GET',
 	            dataType: 'json',
 	            headers: {
@@ -172,7 +184,7 @@ var blog = {
     				$(".preloader-wrapper").removeClass("active");	
 	            },
 	            error: function (error) {
-	               alert('League Not Avaiable !');
+	                // alert('League Not Avaiable !');
            			$(".preloader-wrapper").removeClass("active");	
 	            }
         	});
@@ -183,8 +195,21 @@ var blog = {
 			e.preventDefault();
 			idTeam = $(this).attr("data-id");
 			$(".preloader-wrapper").addClass("active");	
+
+			if ('caches' in window) {
+		    caches.match(self.api_url + 'v2/teams/'+idTeam).then(function(response) {
+					if (response) {
+						 response.json().then(function (data) {
+						 	self.renderModalDetailTeam(data);
+	 	    				$("#detail-team-modal").modal("open");
+		           			$(".preloader-wrapper").removeClass("active");
+						 })
+					}
+				})
+			}
+
 			$.ajax({
-	            url: 'https://api.football-data.org/v2/teams/'+idTeam,
+	            url: self.api_url + 'v2/teams/'+idTeam,
 	            type: 'GET',
 	            dataType: 'json',
 	            headers: {
@@ -197,7 +222,7 @@ var blog = {
 					$(".preloader-wrapper").removeClass("active");	
 	            },
 	            error: function (error) {
-	               alert('err !');
+	               // alert('err !');
            			$(".preloader-wrapper").removeClass("active");	
 	            }
         	});
@@ -361,19 +386,29 @@ var blog = {
 
 	loadListCompetition : function(){	
 		$(".preloader-wrapper").addClass("active");	
+		if ('caches' in window) {
+		    caches.match(self.api_url + "v2/competitions").then(function(response) {
+				if (response) {
+					 response.json().then(function (data) {
+					 	self.renderTableCompetition(data);
+	           			$(".preloader-wrapper").removeClass("active");
+					 })
+				}
+			})
+		}
 		$.ajax({
-            url: 'https://api.football-data.org/v2/competitions',
+            url: self.api_url + 'v2/competitions',
             type: 'GET',
             dataType: 'json',
             headers: {
                 'X-Auth-Token': '41998c78d52e4bf588634a956b0aa17e'
             },
             success: function (result) {
-            	self.renderTableCompetition(result);
+            		self.renderTableCompetition(result);
            		$(".preloader-wrapper").removeClass("active");	
             },
             error: function (error) {
-               alert('err !')
+               // alert('err !')
             }
     	});
 	},
@@ -396,7 +431,14 @@ var blog = {
 			// console.log(rsTeams);
 			i = 0;
 			tr = "";
-			$.each(rsTeams , function(idx , row){
+			if(rsTeams.length == 0){
+				alert("Favorite Team Is Empty");
+				tr = '<tr>\
+						<td colspan=3 style="text-align:center">empty</td>\
+					</tr>';
+				$(tr).appendTo($("#favorite-team-table tbody"));
+			}else{
+				$.each(rsTeams , function(idx , row){
 				i++;
 				tr += 	'<tr>\
 						<td>'+i+'</td>\
@@ -408,6 +450,8 @@ var blog = {
 			});
 
 			$(tr).appendTo($("#favorite-team-table tbody"));
+			}
+			
 			$(".preloader-wrapper").removeClass("active");	
 
 		});

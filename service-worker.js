@@ -1,4 +1,4 @@
-const CACHE_NAME = "PW-v3";
+const CACHE_NAME = "PW-v4";
 var urlsToCache = [
   "/",
   "pages/nav.html",
@@ -27,22 +27,25 @@ self.addEventListener("install", function(event) {
 });
 
 self.addEventListener("fetch", function(event) {
-  event.respondWith(
-    caches
-      .match(event.request, { cacheName: CACHE_NAME })
-      .then(function(response) {
-        if (response) {
-          console.log("ServiceWorker: Load from cache: ", response.url);
+  var base_url = "https://api.football-data.org";
+
+  if (event.request.url.indexOf(base_url) > -1) {
+    // console.log("BASED URL : " + event.request.url);
+    event.respondWith(
+      caches.open(CACHE_NAME).then(function(cache) {
+        return fetch(event.request).then(function(response) {
+          cache.put(event.request.url, response.clone());
           return response;
-        }
- 
-        console.log(
-          "ServiceWorker: Load from server: ",
-          event.request.url
-        );
-        return fetch(event.request);
+        })
       })
-  );
+    );
+  } else {
+    event.respondWith(
+      caches.match(event.request, { ignoreSearch: true }).then(function(response) {
+          return response || fetch (event.request);
+      })
+    )
+  }
 });
 
 
